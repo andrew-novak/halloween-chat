@@ -1,0 +1,30 @@
+{
+  "name": "public-chat",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start:api": "npm run start:dev --prefix api",
+    "start:clientWeb": "npm start --prefix clientWeb",
+    "start:clientMobile": "cd clientMobile && npx expo start",
+    "start:api+clientWeb": "concurrently \"npm run start:api\" \"npm run start:clientWeb\"",
+    "install:api": "npm i --prefix api",
+    "install:clientWeb": "npm i --prefix clientWeb",
+    "install:clientMobile": "npm i --prefix clientMobile",
+    "install:all": "(npm i) && (npm run install:api) && (npm run install:clientWeb) && (npm run install:clientMobile)",
+    "build:client": "npm run build --prefix clientWeb"
+  },
+  "author": {
+    "name": "Andrew Novak",
+    "email": "contact@andrewnovak.co.uk"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andrew-novak/public-chat.git"
+  },
+  "bugs": {
+    "url": "https://github.com/andrew-novak/public-chat/issues"
+  },
+  "devDependencies": {
+    "concurrently": "^7.6.0"
+  }
+}
