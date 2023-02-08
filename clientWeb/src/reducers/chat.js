@@ -3,7 +3,9 @@ import { SET_USERNAME, SET_SOCKET, SET_MESSAGE } from "constants/actionTypes";
 const initialState = {
   username: "",
   socket: null,
-  messages: [{ author: "Essa B|O|I", content: "Hiya bull!" }],
+  // one-message object example:
+  // { author: "John", content: "Hello" }
+  messages: [],
 };
 
 const chat = (state = initialState, action) => {

@@ -61,7 +61,6 @@ const ChatScreen = ({
           flexDirection: "column",
         }}
       >
-        {messages.length}
         {messages.map(({ author, content }, index) => (
           <Typography key={index}>
             {author}: {content}
