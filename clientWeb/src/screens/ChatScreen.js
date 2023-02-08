@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import io from "socket.io-client";
-import { Typography, TextField, Button } from "@mui/material";
+import { Typography, TextField, Button, IconButton } from "@mui/material";
+import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import SendIcon from "@mui/icons-material/Send";
 import { connect } from "react-redux";
 
 import { API_URL } from "constants/urls";
@@ -38,13 +40,22 @@ const ChatScreen = ({
     return () => socket.disconnect();
   }, []);
 
+  const scrollToBottom = () => {
+    window.scrollTo({
+      top: document.documentElement.scrollHeight,
+      behavior: "smooth",
+    });
+  };
+
   return (
     <Screen>
+      {/* Header */}
       <div
         style={{
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
+          backgroundColor: "#c87974",
         }}
       >
         <Typography>Live Public Chat</Typography>
@@ -53,27 +64,107 @@ const ChatScreen = ({
           <Button>Reset Username</Button>
         </div>
       </div>
+      {/* Body */}
       <div
         style={{
-          backgroundColor: "lightblue",
+          backgroundColor: "#695579",
           display: "flex",
           flex: 1,
           flexDirection: "column",
+          justifyContent: "flex-end",
+          alignItems: "flex-start",
+          padding: 24,
         }}
       >
-        {messages.map(({ author, content }, index) => (
-          <Typography key={index}>
-            {author}: {content}
-          </Typography>
-        ))}
+        {messages.map(({ author, content }, index) => {
+          return (
+            <div
+              style={{
+                marginTop: index !== 0 && 8,
+                marginBottom:
+                  messages[index + 1] &&
+                  author !== messages[index + 1].author &&
+                  17,
+                alignSelf: author === username && "end",
+              }}
+            >
+              {/* Author Username */}
+              {/* Do not show  */}
+              {author !== username &&
+                (index === 0 || author !== messages[index - 1].author) && (
+                  <div>
+                    <Typography style={{ color: "#231a2a", fontSize: 16 }}>
+                      {author}
+                    </Typography>
+                  </div>
+                )}
+              {/* Message Content */}
+              <div
+                style={{
+                  backgroundColor: author === username ? "#c87974" : "#45364f",
+                  padding: "2px 10px 2px 10px",
+                  borderRadius: 5,
+                }}
+              >
+                <Typography
+                  key={index}
+                  style={{
+                    fontSize: 18,
+                    color: author === username ? "#231a2a" : "#f2857e",
+                  }}
+                >
+                  {content}
+                </Typography>
+              </div>
+            </div>
+          );
+        })}
       </div>
-      <div>
+      <div style={{ height: 56, width: "100%" }} />
+      <div
+        style={{
+          position: "fixed",
+          height: 40,
+          width: "100%",
+          bottom: 60,
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
+        <IconButton variant="contained" onClick={scrollToBottom}>
+          <ArrowDownwardIcon />
+        </IconButton>
+      </div>
+      {/* Footer */}
+      <div
+        style={{
+          backgroundColor: "#9C7C84",
+          position: "fixed",
+          bottom: 0,
+          height: 56,
+          width: "100%",
+          display: "flex",
+        }}
+      >
         <TextField
           label="Text..."
           value={messageInput}
           onChange={(event) => setMessageInput(event.target.value)}
+          sx={{
+            backgroundColor: "#c87974",
+            flex: 1,
+            input: { color: "#231a2a" },
+          }}
         />
-        <Button onClick={() => sendMessage(socket, username, messageInput)}>
+        <Button
+          endIcon={<SendIcon />}
+          sx={{
+            backgroundColor: "#c87974",
+            paddingLeft: 3,
+            paddingRight: 3,
+          }}
+          onClick={() => sendMessage(socket, username, messageInput)}
+        >
           Send
         </Button>
       </div>
