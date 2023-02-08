@@ -34,11 +34,18 @@ app.use((req, res, next) => {
 
 //app.use("/", rootRouter);
 
+const allMessages = [];
+
 ioServer.on("connection", (socket) => {
   console.log("a user connected");
+
   socket.on("chat message", (message) => {
     console.log("chat message received:", message);
+    allMessages.push(message.content);
+    console.log("messages:", allMessages);
+    ioServer.emit("chat message", message);
   });
+
   socket.on("disconnect", () => {
     console.log("a user disconnected");
   });

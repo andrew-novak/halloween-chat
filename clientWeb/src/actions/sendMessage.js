@@ -1,7 +1,7 @@
 import { API_URL } from "constants/urls";
 
-const sendMessage = (socket, message) => (dispatch) => {
-  socket.emit("chat message", message);
+const sendMessage = (socket, author, content) => (dispatch) => {
+  socket.emit("chat message", { author, content });
 };
 
 export default sendMessage;
