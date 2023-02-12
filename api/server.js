@@ -8,18 +8,15 @@ const logger = require("./debug/logger");
 //const rootRouter = require("./routes");
 
 checkEnvVars();
-if (
-  process.env.NODE_ENV != "development" &&
-  process.env.NODE_ENV != "production"
-) {
-  process.env.NODE_ENV = "development";
-}
 const NODE_ENV = process.env.NODE_ENV;
 const PORT = process.env.PUBLIC_CHAT_API_PORT;
+const SOCKET_IO_PATH = process.env.PUBLIC_CHAT_SOCKET_IO_PATH;
+
 const app = express();
 const httpServer = http.Server(app);
 const ioServer = new socketIo.Server(httpServer, {
   cors: { origin: "http://localhost:3000" },
+  path: SOCKET_IO_PATH,
 });
 
 // app.use(cors());

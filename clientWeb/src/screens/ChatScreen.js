@@ -11,6 +11,9 @@ import addMessage from "actions/addMessage";
 import sendMessage from "actions/sendMessage";
 import Screen from "components/Screen";
 
+const NODE_ENV = process.env.NODE_ENV;
+const SOCKET_IO_PATH = process.env.REACT_APP_SOCKET_IO_PATH;
+
 const ChatScreen = ({
   username,
   socket,
@@ -22,7 +25,9 @@ const ChatScreen = ({
   const [messageInput, setMessageInput] = useState("");
 
   useEffect(() => {
-    const socket = io.connect(API_URL);
+    const socket = io.connect(API_URL, {
+      path: NODE_ENV === "production" && SOCKET_IO_PATH,
+    });
 
     socket.on("connect", () => {
       console.log("connected");
