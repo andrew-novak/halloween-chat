@@ -34,17 +34,17 @@ app.use((req, res, next) => {
 const allMessages = [];
 
 ioServer.on("connection", (socket) => {
-  console.log("a user connected");
+  logger.info("a user connected");
 
   socket.on("chat message", (message) => {
-    console.log("chat message received:", message);
+    logger.info("chat message received:", message);
     allMessages.push(message.content);
-    console.log("messages:", allMessages);
+    logger.info("messages:", allMessages);
     ioServer.emit("chat message", message);
   });
 
   socket.on("disconnect", () => {
-    console.log("a user disconnected");
+    logger.info("a user disconnected");
   });
 });
 
