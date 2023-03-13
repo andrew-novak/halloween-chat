@@ -15,7 +15,9 @@ const SOCKET_IO_PATH = process.env.PUBLIC_CHAT_SOCKET_IO_PATH;
 const app = express();
 const httpServer = http.Server(app);
 const ioServer = new socketIo.Server(httpServer, {
-  cors: { origin: "http://localhost:3000" },
+  ...(NODE_ENV === "development" && {
+    cors: { origin: "http://localhost:3000" },
+  }),
   path: SOCKET_IO_PATH,
 });
 
@@ -35,6 +37,8 @@ const allMessages = [];
 
 ioServer.on("connection", (socket) => {
   logger.info("a user connected");
+
+  ioServer.of("");
 
   socket.on("chat message", (message) => {
     logger.info("chat message received:", message);

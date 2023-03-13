@@ -10,6 +10,7 @@ import setSocket from "actions/setSocket";
 import addMessage from "actions/addMessage";
 import sendMessage from "actions/sendMessage";
 import Screen from "components/Screen";
+import icon from "./public-chat-icon.svg";
 
 const NODE_ENV = process.env.NODE_ENV;
 const SOCKET_IO_PATH = process.env.REACT_APP_SOCKET_IO_PATH;
@@ -60,10 +61,67 @@ const ChatScreen = ({
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
-          backgroundColor: "#c87974",
+          alignItems: "center",
+          backgroundColor: "#d0837e",
+          paddingTop: 5,
+          paddingBottom: 5,
+          paddingLeft: 15,
+          paddingRight: 15,
         }}
       >
-        <Typography>Live Public Chat</Typography>
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <div
+            style={{
+              position: "relative",
+              height: 64,
+              width: 64,
+              marginRight: 15,
+            }}
+          >
+            {/*
+            <div
+              style={{
+                position: "absolute",
+                height: 72,
+                width: 72,
+                backgroundImage: `url(${icon})`,
+                filter: "blur(0px)",
+              }}
+            />*/}
+            <img
+              style={{
+                position: "absolute",
+                //height: isLargerThanSm ? 50 : 46,
+                height: 64,
+                width: 64,
+                filter: "blur(0.5px)",
+              }}
+              alt="logo"
+              src={icon}
+            />
+            <img
+              style={{
+                position: "absolute",
+                //height: isLargerThanSm ? 50 : 46,
+                height: 64,
+                width: 64,
+              }}
+              alt="logo"
+              src={icon}
+            />
+          </div>
+          <Typography
+            variant="h4"
+            sx={{
+              fontSize: 42,
+              fontFamily: "Lobster, cursive",
+              fontFamily: "Pacifico, cursive",
+              color: "#682149",
+            }}
+          >
+            Public Chat
+          </Typography>
+        </div>
         <div>
           <Typography>{username}</Typography>
           <Button>Reset Username</Button>
@@ -72,7 +130,7 @@ const ChatScreen = ({
       {/* Body */}
       <div
         style={{
-          backgroundColor: "#695579",
+          backgroundColor: "#451746",
           display: "flex",
           flex: 1,
           flexDirection: "column",
