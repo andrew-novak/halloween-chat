@@ -115,7 +115,6 @@ const ChatScreen = ({
             sx={{
               fontSize: 42,
               fontFamily: "Lobster, cursive",
-              fontFamily: "Pacifico, cursive",
               color: "#682149",
             }}
           >
