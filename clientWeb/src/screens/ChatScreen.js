@@ -26,12 +26,17 @@ const ChatScreen = ({
   const [messageInput, setMessageInput] = useState("");
 
   useEffect(() => {
+    console.log(
+      `An attempt to establish a connection to Socket.IO using following:`
+    );
+    console.log("--- API URL:", API_URL);
+    console.log("--- Socket.IO path:", SOCKET_IO_PATH);
     const socket = io.connect(API_URL, {
       path: NODE_ENV === "production" && SOCKET_IO_PATH,
     });
 
     socket.on("connect", () => {
-      console.log("connected");
+      console.log("Connected.");
       setSocket(socket);
     });
     socket.on("disconnect", () => {
@@ -141,6 +146,7 @@ const ChatScreen = ({
         {messages.map(({ author, content }, index) => {
           return (
             <div
+              key={index}
               style={{
                 marginTop: index !== 0 && 8,
                 marginBottom:
