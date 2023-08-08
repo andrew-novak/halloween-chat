@@ -24,12 +24,21 @@ const ioServer = new socketIo.Server(httpServer, {
 // app.use(cors());
 
 app.use(express.json({ limit: "10mb" }));
-/*
+
+// log requests
 app.use((req, res, next) => {
-  logger.debug(`got request: ${req.method} ${req.url}`);
+  logger.debug(`Express request: ${req.method} ${req.url}`);
   next();
 });
-*/
+ioServer.use((socket, next) => {
+  socket.onAny((eventName, ...args) => {
+    logger.debug(
+      `Socket.IO event: "${socket.nsp.name}" "${socket.id}" "${eventName}" "${socket.request.url}" Arguments:`,
+      args
+    );
+  });
+  next();
+});
 
 //app.use("/", rootRouter);
 
