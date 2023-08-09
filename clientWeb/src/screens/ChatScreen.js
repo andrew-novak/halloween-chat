@@ -13,6 +13,7 @@ import Screen from "components/Screen";
 import icon from "./public-chat-icon.svg";
 
 const NODE_ENV = process.env.NODE_ENV;
+const SOCKET_IO_BASE = process.env.REACT_APP_SOCKET_IO_BASE;
 const SOCKET_IO_PATH = process.env.REACT_APP_SOCKET_IO_PATH;
 
 const ChatScreen = ({
@@ -29,11 +30,14 @@ const ChatScreen = ({
     console.log(
       `An attempt to establish a connection to Socket.IO using following:`
     );
-    console.log("--- API URL:", API_URL);
+    console.log("--- Socket.IO base:", SOCKET_IO_BASE);
     console.log("--- Socket.IO path:", SOCKET_IO_PATH);
-    const socket = io.connect(API_URL, {
-      path: NODE_ENV === "production" && SOCKET_IO_PATH,
-    });
+    const socket = io.connect(
+      NODE_ENV === "production" ? SOCKET_IO_BASE : API_URL,
+      {
+        path: NODE_ENV === "production" && SOCKET_IO_PATH,
+      }
+    );
 
     socket.on("connect", () => {
       console.log("Connected.");
