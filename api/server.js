@@ -51,11 +51,18 @@ try {
 
     ioServer.of("");
 
-    socket.on("chat message", (message) => {
-      logger.info("chat message received:", message);
-      allMessages.push(message.content);
+    socket.on("text message", (message) => {
+      logger.info("text message received:", message);
+      allMessages.push(message);
       logger.info("messages:", allMessages);
-      ioServer.emit("chat message", message);
+      ioServer.emit("text message", message);
+    });
+
+    socket.on("emoji message", (message) => {
+      logger.info("emoji message received:", message);
+      allMessages.push(message);
+      logger.info("messages:", allMessages);
+      ioServer.emit("emoji message", message);
     });
 
     socket.on("disconnect", () => {

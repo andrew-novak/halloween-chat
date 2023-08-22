@@ -1,4 +1,4 @@
-import { SET_USERNAME, SET_SOCKET, SET_MESSAGE } from "constants/actionTypes";
+import { SET_USERNAME, SET_SOCKET, ADD_MESSAGE } from "constants/actionTypes";
 
 const initialState = {
   username: "",
@@ -16,7 +16,7 @@ const chat = (state = initialState, action) => {
     case SET_SOCKET:
       return { ...state, socket: action.socket };
 
-    case SET_MESSAGE:
+    case ADD_MESSAGE:
       return { ...state, messages: [...state.messages, action.message] };
 
     default:

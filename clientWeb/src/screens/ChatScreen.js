@@ -1,16 +1,20 @@
-import { useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
+import { useTheme } from "@mui/material/styles";
 import io from "socket.io-client";
 import { Typography, TextField, Button, IconButton } from "@mui/material";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
+import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
 import SendIcon from "@mui/icons-material/Send";
 import { connect } from "react-redux";
 
 import { API_URL } from "constants/urls";
 import setSocket from "actions/setSocket";
-import addMessage from "actions/addMessage";
-import sendMessage from "actions/sendMessage";
+import { receiveText, receiveEmoji } from "actions/receive";
+import { sendText, sendEmoji } from "actions/send";
 import Screen from "components/Screen";
+import EmojiButton from "components/EmojiButton";
 import icon from "./public-chat-icon.svg";
+import emojis from "constants/emojis";
 
 const NODE_ENV = process.env.NODE_ENV;
 const SOCKET_IO_BASE = process.env.REACT_APP_SOCKET_IO_BASE;
@@ -21,10 +25,15 @@ const ChatScreen = ({
   socket,
   messages,
   setSocket,
-  addMessage,
-  sendMessage,
+  receiveText,
+  receiveEmoji,
+  sendText,
+  sendEmoji,
 }) => {
+  const theme = useTheme();
+
   const [messageInput, setMessageInput] = useState("");
+  const [isDisplayingEmojis, setIsDisplayingEmojis] = useState(false);
 
   useEffect(() => {
     console.log(
@@ -46,9 +55,8 @@ const ChatScreen = ({
     socket.on("disconnect", () => {
       setSocket(null);
     });
-    socket.on("chat message", (message) => {
-      addMessage(message);
-    });
+    socket.on("text message", receiveText);
+    socket.on("emoji message", receiveEmoji);
     socket.on("connect_error", (err) => {
       console.log(`connect_error due to err:`, err);
     });
@@ -60,6 +68,16 @@ const ChatScreen = ({
       top: document.documentElement.scrollHeight,
       behavior: "smooth",
     });
+  };
+
+  const submitText = () => {
+    sendText(socket, username, messageInput);
+    setMessageInput("");
+  };
+
+  const submitEmoji = (emojiName) => {
+    sendEmoji(socket, username, emojiName);
+    setIsDisplayingEmojis(false);
   };
 
   return (
@@ -147,7 +165,7 @@ const ChatScreen = ({
           padding: 24,
         }}
       >
-        {messages.map(({ author, content }, index) => {
+        {messages.map(({ author, category, content, emojiName }, index) => {
           return (
             <div
               key={index}
@@ -171,23 +189,41 @@ const ChatScreen = ({
                   </div>
                 )}
               {/* Message Content */}
-              <div
-                style={{
-                  backgroundColor: author === username ? "#c87974" : "#45364f",
-                  padding: "2px 10px 2px 10px",
-                  borderRadius: 5,
-                }}
-              >
-                <Typography
-                  key={index}
+              {category === "emoji" && (
+                <img
+                  src={emojis.find((emoji) => emoji.name === emojiName).src}
+                  alt="Emoji"
                   style={{
-                    fontSize: 18,
-                    color: author === username ? "#231a2a" : "#f2857e",
+                    width: "70px",
+                    height: "70px",
+                    objectFit: "cover",
+                    borderRadius: "100%",
+                    borderStyle: "solid",
+                    borderWidth: "5px",
+                    borderColor: author === username ? "#c87974" : "#45364f",
+                  }}
+                />
+              )}
+              {category === "text" && (
+                <div
+                  style={{
+                    backgroundColor:
+                      author === username ? "#c87974" : "#45364f",
+                    padding: "2px 10px 2px 10px",
+                    borderRadius: 5,
                   }}
                 >
-                  {content}
-                </Typography>
-              </div>
+                  <Typography
+                    key={index}
+                    style={{
+                      fontSize: 18,
+                      color: author === username ? "#231a2a" : "#f2857e",
+                    }}
+                  >
+                    {content}
+                  </Typography>
+                </div>
+              )}
             </div>
           );
         })}
@@ -218,27 +254,64 @@ const ChatScreen = ({
           display: "flex",
         }}
       >
-        <TextField
-          label="Text..."
-          value={messageInput}
-          onChange={(event) => setMessageInput(event.target.value)}
-          sx={{
-            backgroundColor: "#c87974",
-            flex: 1,
-            input: { color: "#231a2a" },
-          }}
-        />
-        <Button
-          endIcon={<SendIcon />}
-          sx={{
-            backgroundColor: "#c87974",
-            paddingLeft: 3,
-            paddingRight: 3,
-          }}
-          onClick={() => sendMessage(socket, username, messageInput)}
-        >
-          Send
-        </Button>
+        {/* Emoji Toggle */}
+        {isDisplayingEmojis ? (
+          <button onClick={() => setIsDisplayingEmojis(false)}>Cancel</button>
+        ) : (
+          <IconButton onClick={() => setIsDisplayingEmojis(true)}>
+            <EmojiEmotionsIcon />
+          </IconButton>
+        )}
+        {/* Text Input & Send Button */}
+        {!isDisplayingEmojis && (
+          <>
+            <TextField
+              label="Text..."
+              value={messageInput}
+              onChange={(event) => setMessageInput(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  submitText();
+                }
+              }}
+              sx={{
+                backgroundColor: "#c87974",
+                flex: 1,
+                input: { color: "#231a2a" },
+              }}
+            />
+            <Button
+              endIcon={<SendIcon />}
+              sx={{
+                backgroundColor: "#c87974",
+                paddingLeft: 3,
+                paddingRight: 3,
+              }}
+              onClick={submitText}
+            >
+              Send
+            </Button>
+          </>
+        )}
+        {/* Emojis Selection */}
+        {isDisplayingEmojis && (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              gap: 16,
+              paddingLeft: 16,
+              paddingRight: 16,
+            }}
+          >
+            {emojis.map((emoji) => (
+              <EmojiButton
+                src={emoji.src}
+                onClick={() => submitEmoji(emoji.name)}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </Screen>
   );
@@ -249,6 +322,10 @@ const mapState = (state) => {
   return { username, socket, messages };
 };
 
-export default connect(mapState, { setSocket, addMessage, sendMessage })(
-  ChatScreen
-);
+export default connect(mapState, {
+  setSocket,
+  receiveText,
+  receiveEmoji,
+  sendText,
+  sendEmoji,
+})(ChatScreen);
