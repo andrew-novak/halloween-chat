@@ -4,13 +4,9 @@ const Screen = ({ children }) => {
   return (
     <div
       style={{
+        minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
-        position: "absolute",
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0,
       }}
     >
       {children}

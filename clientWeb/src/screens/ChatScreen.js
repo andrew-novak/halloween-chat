@@ -1,7 +1,8 @@
 import { useRef, useState, useEffect } from "react";
 import { useTheme } from "@mui/material/styles";
 import io from "socket.io-client";
-import { Typography, TextField, Button, IconButton } from "@mui/material";
+import { Typography, TextField, Button, IconButton, Box } from "@mui/material";
+import EditIcon from "@mui/icons-material/Edit";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
 import SendIcon from "@mui/icons-material/Send";
@@ -9,6 +10,7 @@ import { connect } from "react-redux";
 
 import { API_URL } from "constants/urls";
 import setSocket from "actions/setSocket";
+import resetState from "actions/resetState";
 import { receiveText, receiveEmoji } from "actions/receive";
 import { sendText, sendEmoji } from "actions/send";
 import Screen from "components/Screen";
@@ -25,6 +27,7 @@ const ChatScreen = ({
   socket,
   messages,
   setSocket,
+  resetState,
   receiveText,
   receiveEmoji,
   sendText,
@@ -85,6 +88,9 @@ const ChatScreen = ({
       {/* Header */}
       <div
         style={{
+          position: "fixed",
+          //height: "100vh",
+          width: "100%",
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
@@ -105,16 +111,6 @@ const ChatScreen = ({
               marginRight: 15,
             }}
           >
-            {/*
-            <div
-              style={{
-                position: "absolute",
-                height: 72,
-                width: 72,
-                backgroundImage: `url(${icon})`,
-                filter: "blur(0px)",
-              }}
-            />*/}
             <img
               style={{
                 position: "absolute",
@@ -143,14 +139,58 @@ const ChatScreen = ({
               fontSize: 42,
               fontFamily: "Lobster, cursive",
               color: "#682149",
+              [theme.breakpoints.down("sm")]: {
+                //fontSize: (42 * 3) / 4,
+                display: "none",
+              },
             }}
           >
-            Public Chat
+            Halloween Chat
           </Typography>
         </div>
-        <div>
-          <Typography>{username}</Typography>
-          <Button>Reset Username</Button>
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <Typography
+              sx={{
+                fontSize: 24,
+                color: "#40142d",
+              }}
+            >
+              Hi,{" "}
+            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                color: "#40142d",
+                backgroundColor: "rgba(255, 255, 255, 0.26)",
+                borderRadius: "4px",
+                padding: "4px 8px",
+                margin: 0.5,
+                gap: 0.5,
+                "&:hover": {
+                  cursor: "pointer",
+                },
+              }}
+              onClick={resetState}
+            >
+              <Typography
+                sx={{
+                  fontSize: 24,
+                  color: "inherit",
+                  //width: 200,
+                  //minWidth: 20,
+                  maxWidth: 200,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {username}
+              </Typography>
+              <EditIcon sx={{ fontSize: 24, color: "inherit" }} />
+            </Box>
+          </div>
         </div>
       </div>
       {/* Body */}
@@ -163,6 +203,9 @@ const ChatScreen = ({
           justifyContent: "flex-end",
           alignItems: "flex-start",
           padding: 24,
+          // header/footer width + 24
+          paddingTop: 74 + 24,
+          paddingBottom: 56 + 24,
         }}
       >
         {messages.map(({ author, category, content, emojiName }, index) => {
@@ -268,6 +311,7 @@ const ChatScreen = ({
             <TextField
               label="Text..."
               value={messageInput}
+              autoComplete="off"
               onChange={(event) => setMessageInput(event.target.value)}
               onKeyDown={(event) => {
                 if (event.key === "Enter") {
@@ -324,6 +368,7 @@ const mapState = (state) => {
 
 export default connect(mapState, {
   setSocket,
+  resetState,
   receiveText,
   receiveEmoji,
   sendText,
