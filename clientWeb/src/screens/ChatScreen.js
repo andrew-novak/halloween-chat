@@ -1,10 +1,18 @@
 import { useRef, useState, useEffect } from "react";
 import { useTheme } from "@mui/material/styles";
 import io from "socket.io-client";
-import { Typography, TextField, Button, IconButton, Box } from "@mui/material";
+import {
+  Typography,
+  TextareaAutosize,
+  TextField,
+  Button,
+  IconButton,
+  Box,
+} from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward";
 import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
+import CloseIcon from "@mui/icons-material/Close";
 import SendIcon from "@mui/icons-material/Send";
 import { connect } from "react-redux";
 
@@ -35,9 +43,12 @@ const ChatScreen = ({
 }) => {
   const theme = useTheme();
 
+  const footerRef = useRef();
+  const [footerHeight, setFooterHeight] = useState(0);
   const [messageInput, setMessageInput] = useState("");
   const [isDisplayingEmojis, setIsDisplayingEmojis] = useState(false);
 
+  // Socket.IO Socket
   useEffect(() => {
     console.log(
       `An attempt to establish a connection to Socket.IO using following:`
@@ -64,6 +75,28 @@ const ChatScreen = ({
       console.log(`connect_error due to err:`, err);
     });
     return () => socket.disconnect();
+  }, []);
+
+  // Listen to Footer Height Changes
+  useEffect(() => {
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (entry.target === footerRef.current) {
+          setFooterHeight(entry.target.offsetHeight);
+        }
+      }
+    });
+
+    if (footerRef.current) {
+      // capture initial height
+      setFooterHeight(footerRef.current.offsetHeight);
+      // start observing
+      resizeObserver.observe(footerRef.current);
+    }
+
+    return () => {
+      resizeObserver.disconnect();
+    };
   }, []);
 
   const scrollToBottom = () => {
@@ -121,6 +154,7 @@ const ChatScreen = ({
               }}
               alt="logo"
               src={icon}
+              onDragStart={(event) => event.preventDefault()}
             />
             <img
               style={{
@@ -131,6 +165,7 @@ const ChatScreen = ({
               }}
               alt="logo"
               src={icon}
+              onDragStart={(event) => event.preventDefault()}
             />
           </div>
           <Typography
@@ -203,9 +238,11 @@ const ChatScreen = ({
           justifyContent: "flex-end",
           alignItems: "flex-start",
           padding: 24,
-          // header/footer width + 24
+          // header/footer height + 24
           paddingTop: 74 + 24,
-          paddingBottom: 56 + 24,
+          paddingBottom: footerHeight + 24,
+          //paddingBottom: 56 + 20 + 24,
+          //paddingBottom: 56 + 24,
         }}
       >
         {messages.map(({ author, category, content, emojiName }, index) => {
@@ -271,13 +308,13 @@ const ChatScreen = ({
           );
         })}
       </div>
-      <div style={{ height: 56, width: "100%" }} />
+      {/* Scroll Down Button */}
       <div
         style={{
           position: "fixed",
           height: 40,
           width: "100%",
-          bottom: 60,
+          bottom: 80,
           display: "flex",
           justifyContent: "center",
         }}
@@ -288,20 +325,46 @@ const ChatScreen = ({
       </div>
       {/* Footer */}
       <div
+        ref={footerRef}
         style={{
-          backgroundColor: "#9C7C84",
+          backgroundColor: "#c87974",
           position: "fixed",
           bottom: 0,
-          height: 56,
+          minHeight: 56 + 20,
+          paddingTop: 10,
+          paddingBottom: 10,
+          paddingLeft: 16,
+          paddingRight: 16,
           width: "100%",
           display: "flex",
+          alignItems: "center",
         }}
       >
         {/* Emoji Toggle */}
         {isDisplayingEmojis ? (
-          <button onClick={() => setIsDisplayingEmojis(false)}>Cancel</button>
+          <IconButton
+            sx={{
+              marginRight: 2,
+              backgroundColor: "rgba(255, 255, 255, 0.26)",
+              "&:hover": {
+                backgroundColor: "rgba(255, 255, 255, 0.26)",
+              },
+            }}
+            onClick={() => setIsDisplayingEmojis(false)}
+          >
+            <CloseIcon />
+          </IconButton>
         ) : (
-          <IconButton onClick={() => setIsDisplayingEmojis(true)}>
+          <IconButton
+            sx={{
+              marginRight: 2,
+              backgroundColor: "rgba(255, 255, 255, 0.26)",
+              "&:hover": {
+                backgroundColor: "rgba(255, 255, 255, 0.26)",
+              },
+            }}
+            onClick={() => setIsDisplayingEmojis(true)}
+          >
             <EmojiEmotionsIcon />
           </IconButton>
         )}
@@ -311,25 +374,31 @@ const ChatScreen = ({
             <TextField
               label="Text..."
               value={messageInput}
+              autoFocus
+              multiline
+              minRows={1}
+              maxRows={3}
               autoComplete="off"
+              sx={{
+                backgroundColor: "rgba(255, 255, 255, 0.26)",
+                borderRadius: "4px",
+                flex: 1,
+                input: { color: "#231a2a" },
+              }}
               onChange={(event) => setMessageInput(event.target.value)}
               onKeyDown={(event) => {
                 if (event.key === "Enter") {
                   submitText();
                 }
               }}
-              sx={{
-                backgroundColor: "#c87974",
-                flex: 1,
-                input: { color: "#231a2a" },
-              }}
             />
             <Button
-              endIcon={<SendIcon />}
+              variant="contained"
+              endIcon={<SendIcon sx={{ fontSize: 24 }} />}
               sx={{
-                backgroundColor: "#c87974",
-                paddingLeft: 3,
-                paddingRight: 3,
+                fontSize: 24,
+                marginLeft: 2,
+                marginRight: 2,
               }}
               onClick={submitText}
             >
@@ -344,8 +413,8 @@ const ChatScreen = ({
               display: "flex",
               flexDirection: "row",
               gap: 16,
-              paddingLeft: 16,
-              paddingRight: 16,
+              //paddingLeft: 16,
+              //paddingRight: 16,
             }}
           >
             {emojis.map((emoji) => (

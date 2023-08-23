@@ -22,6 +22,7 @@ const EmojiButton = ({ src, onClick }) => {
             height: "100%",
             objectFit: "cover",
           }}
+          onDragStart={(event) => event.preventDefault()}
         />
       </IconButton>
     </div>

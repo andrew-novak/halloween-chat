@@ -55,6 +55,7 @@ const EnterUsernameScreen = ({ setUsername }) => {
               }}
               alt="logo"
               src={icon}
+              onDragStart={(event) => event.preventDefault()}
             />
           </div>
           <Typography
