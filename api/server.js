@@ -9,8 +9,8 @@ const logger = require("./debug/logger");
 
 checkEnvVars();
 const NODE_ENV = process.env.NODE_ENV;
-const PORT = process.env.PUBLIC_CHAT_API_PORT;
-const SOCKET_IO_PATH = process.env.PUBLIC_CHAT_SOCKET_IO_PATH;
+const PORT = process.env.PUBLIC_HALLOWEEN_CHAT_API_PORT;
+const SOCKET_IO_PATH = process.env.PUBLIC_HALLOWEEN_CHAT_SOCKET_IO_PATH;
 
 let httpServer;
 try {
