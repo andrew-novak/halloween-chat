@@ -23,7 +23,7 @@ import { receiveText, receiveEmoji } from "actions/receive";
 import { sendText, sendEmoji } from "actions/send";
 import Screen from "components/Screen";
 import EmojiButton from "components/EmojiButton";
-import icon from "./public-chat-icon.svg";
+import icon from "assets/brand-icon.svg";
 import emojis from "constants/emojis";
 
 const NODE_ENV = process.env.NODE_ENV;

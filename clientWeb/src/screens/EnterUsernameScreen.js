@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Box, Typography, TextField, Button } from "@mui/material";
 import { connect } from "react-redux";
 
-import icon from "./public-chat-icon.svg";
+import icon from "assets/brand-icon.svg";
 import { setUsername } from "actions/user";
 import Screen from "components/Screen";
 
