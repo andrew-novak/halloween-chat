@@ -26,6 +26,10 @@ import EmojiButton from "components/EmojiButton";
 import icon from "assets/brand-icon.svg";
 import emojis from "constants/emojis";
 
+const NODE_ENV = process.env.NODE_ENV;
+const SOCKET_IO_BASE = process.env.REACT_APP_SOCKET_IO_BASE;
+const SOCKET_IO_PATH = process.env.REACT_APP_SOCKET_IO_PATH;
+
 const ChatScreen = ({
   username,
   socket,
@@ -48,9 +52,17 @@ const ChatScreen = ({
   // Socket.IO Socket
   useEffect(() => {
     console.log(
-      `An attempt to establish a connection to Socket.IO on ${API_URL} with default /socket.io path`
+      `An attempt to establish a connection to Socket.IO using following:`
     );
-    const socket = io.connect(API_URL);
+    console.log("--- Socket.IO base:", SOCKET_IO_BASE);
+    console.log("--- Socket.IO path:", SOCKET_IO_PATH);
+
+    const socket = io.connect(
+      NODE_ENV === "production" ? SOCKET_IO_BASE : API_URL,
+      {
+        path: NODE_ENV === "production" && SOCKET_IO_PATH,
+      }
+    );
 
     socket.on("connect", () => {
       console.log("Connected.");
