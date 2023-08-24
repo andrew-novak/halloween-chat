@@ -62,6 +62,10 @@ const ChatScreen = ({
         path: NODE_ENV === "production" && SOCKET_IO_PATH,
       }
     );
+    if (!socket)
+      return console.error(
+        "Unable to establish a connection, 'socket' is 'null'"
+      );
 
     socket.on("connect", () => {
       console.log("Connected.");
@@ -121,11 +125,19 @@ const ChatScreen = ({
   };
 
   const submitText = () => {
+    if (!socket)
+      return console.error(
+        "Unable to submit a text message, 'socket' is 'null'"
+      );
     sendText(socket, username, messageInput);
     setMessageInput("");
   };
 
   const submitEmoji = (emojiName) => {
+    if (!socket)
+      return console.error(
+        "Unable to submit an emoji message, 'socket' is 'null'"
+      );
     sendEmoji(socket, username, emojiName);
     setIsDisplayingEmojis(false);
   };
