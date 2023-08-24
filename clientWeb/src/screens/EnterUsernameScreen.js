@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Box, Typography, TextField, Button } from "@mui/material";
 import { connect } from "react-redux";
 
@@ -8,6 +8,23 @@ import Screen from "components/Screen";
 
 const EnterUsernameScreen = ({ setUsername }) => {
   const [usernameInput, setUsernameInput] = useState("");
+
+  // react to "enter" button click
+  const handleKeyDown = (event) => {
+    if (event.keyCode === 13) {
+      console.log("ELO", usernameInput);
+      setUsername(usernameInput);
+    }
+  };
+
+  // listen to key down
+  useEffect(() => {
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [usernameInput]);
+
   return (
     <Screen>
       <div
@@ -77,6 +94,7 @@ const EnterUsernameScreen = ({ setUsername }) => {
           <TextField
             label="Your username"
             value={usernameInput}
+            autoFocus
             autoComplete="off"
             sx={{ width: 261, paddingBottom: 2 }}
             onChange={(event) => setUsernameInput(event.target.value)}

@@ -43,6 +43,7 @@ const ChatScreen = ({
 }) => {
   const theme = useTheme();
 
+  const textInputRef = useRef();
   const footerRef = useRef();
   const [footerHeight, setFooterHeight] = useState(0);
   const [messageInput, setMessageInput] = useState("");
@@ -97,6 +98,19 @@ const ChatScreen = ({
     return () => {
       resizeObserver.disconnect();
     };
+  }, []);
+
+  // Always focus TextField
+  useEffect(() => {
+    if (textInputRef.current) {
+      const handleFocus = () => {
+        textInputRef.current.focus();
+      };
+      window.addEventListener("click", handleFocus);
+      return () => {
+        window.removeEventListener("click", handleFocus);
+      };
+    }
   }, []);
 
   const scrollToBottom = () => {
@@ -255,6 +269,8 @@ const ChatScreen = ({
                   messages[index + 1] &&
                   author !== messages[index + 1].author &&
                   17,
+                height: category === "emoji" && "70px",
+                // author's messages on right side
                 alignSelf: author === username && "end",
               }}
             >
@@ -374,6 +390,7 @@ const ChatScreen = ({
             <TextField
               label="Text..."
               value={messageInput}
+              inputRef={textInputRef}
               autoFocus
               multiline
               minRows={1}
@@ -387,7 +404,8 @@ const ChatScreen = ({
               }}
               onChange={(event) => setMessageInput(event.target.value)}
               onKeyDown={(event) => {
-                if (event.key === "Enter") {
+                if (event.key === "Enter" && !event.shiftKey) {
+                  event.preventDefault(); // Prevent newline
                   submitText();
                 }
               }}
