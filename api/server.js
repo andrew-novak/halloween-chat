@@ -72,7 +72,7 @@ try {
 
   httpServer.listen(PORT, () =>
     logger.info(
-      `server started on port: ${PORT} with NODE_ENV: ${NODE} & SOCKET_IO_PATH: ${SOCKET_IO_PATH}`
+      `server started on port: ${PORT} with NODE_ENV: ${NODE_ENV} & SOCKET_IO_PATH: ${SOCKET_IO_PATH}`
     )
   );
 } catch (err) {
