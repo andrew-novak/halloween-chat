@@ -10,7 +10,6 @@ const logger = require("./debug/logger");
 checkEnvVars();
 const NODE_ENV = process.env.NODE_ENV;
 const PORT = process.env.PUBLIC_HALLOWEEN_CHAT_API_PORT;
-const SOCKET_IO_PATH = process.env.PUBLIC_HALLOWEEN_CHAT_SOCKET_IO_PATH;
 
 let httpServer;
 try {
@@ -20,7 +19,6 @@ try {
     ...(NODE_ENV === "development" && {
       cors: { origin: "http://localhost:3000" },
     }),
-    path: SOCKET_IO_PATH,
   });
 
   // app.use(cors());
@@ -71,9 +69,7 @@ try {
   });
 
   httpServer.listen(PORT, () =>
-    logger.info(
-      `server started on port: ${PORT} with NODE_ENV: ${NODE_ENV} & SOCKET_IO_PATH: ${SOCKET_IO_PATH}`
-    )
+    logger.info(`server started on port: ${PORT} with NODE_ENV: ${NODE_ENV}`)
   );
 } catch (err) {
   logger.error("An error occured:");
