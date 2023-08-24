@@ -62,10 +62,6 @@ const ChatScreen = ({
         path: NODE_ENV === "production" && SOCKET_IO_PATH,
       }
     );
-    if (!socket)
-      return console.error(
-        "Unable to establish a connection, 'socket' is 'null'"
-      );
 
     socket.on("connect", () => {
       console.log("Connected.");
@@ -77,7 +73,10 @@ const ChatScreen = ({
     socket.on("text message", receiveText);
     socket.on("emoji message", receiveEmoji);
     socket.on("connect_error", (err) => {
-      console.log(`connect_error due to err:`, err);
+      console.error(
+        `An error occurred during a connection attempt (connect_error):`
+      );
+      console.error(err);
     });
     return () => socket.disconnect();
   }, []);
