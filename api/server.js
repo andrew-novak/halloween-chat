@@ -63,6 +63,13 @@ try {
       }
 
       socket.on("remove_username", () => {
+        const username = namedUsers[socket.id].username || null;
+        if (username) {
+          logger.info(`user '${username}' removed username`);
+        }
+        // If an anonymous user will emit remove_username that's ok,
+        // nothing will happen and they will receive the response, so
+        // they will be able to redirect to the enter username screen.
         removeUserFromList(socket.id);
         socket.emit("remove_username_response");
       });
@@ -89,7 +96,12 @@ try {
     });
 
     socket.on("disconnect", () => {
-      logger.info("user disconnected");
+      const username = namedUsers[socket.id].username || null;
+      if (username) {
+        logger.info(`user '${username}' disconnected`);
+      } else {
+        logger.info("anonymous user disconnected");
+      }
       removeUserFromList(socket.id);
     });
   });
