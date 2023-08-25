@@ -1,6 +1,5 @@
 import { useRef, useState, useEffect } from "react";
 import { useTheme } from "@mui/material/styles";
-import io from "socket.io-client";
 import {
   Typography,
   TextareaAutosize,
@@ -16,26 +15,24 @@ import CloseIcon from "@mui/icons-material/Close";
 import SendIcon from "@mui/icons-material/Send";
 import { connect } from "react-redux";
 
-import { API_URL } from "constants/urls";
-import setSocket from "actions/setSocket";
-import resetState from "actions/resetState";
-import { receiveText, receiveEmoji } from "actions/receive";
+import {
+  receiveRemoveUsernameResponse,
+  receiveUserList,
+  receiveText,
+  receiveEmoji,
+} from "actions/receive";
 import { sendText, sendEmoji } from "actions/send";
 import Screen from "components/Screen";
 import EmojiButton from "components/EmojiButton";
 import icon from "assets/brand-icon.svg";
 import emojis from "constants/emojis";
 
-const NODE_ENV = process.env.NODE_ENV;
-const SOCKET_IO_BASE = process.env.REACT_APP_SOCKET_IO_BASE;
-const SOCKET_IO_PATH = process.env.REACT_APP_SOCKET_IO_PATH;
-
 const ChatScreen = ({
-  username,
   socket,
+  username,
   messages,
-  setSocket,
-  resetState,
+  receiveRemoveUsernameResponse,
+  receiveUserList,
   receiveText,
   receiveEmoji,
   sendText,
@@ -49,38 +46,21 @@ const ChatScreen = ({
   const [messageInput, setMessageInput] = useState("");
   const [isDisplayingEmojis, setIsDisplayingEmojis] = useState(false);
 
-  // Socket.IO Socket
+  // Socket.IO
   useEffect(() => {
-    console.log(
-      `An attempt to establish a connection to Socket.IO using following:`
-    );
-    console.log("--- Socket.IO base:", SOCKET_IO_BASE);
-    console.log("--- Socket.IO path:", SOCKET_IO_PATH);
-
-    const socket = io.connect(
-      NODE_ENV === "production" ? SOCKET_IO_BASE : API_URL,
-      {
-        path: NODE_ENV === "production" && SOCKET_IO_PATH,
-      }
-    );
-
-    socket.on("connect", () => {
-      console.log("Connected.");
-      setSocket(socket);
-    });
-    socket.on("disconnect", () => {
-      setSocket(null);
-    });
-    socket.on("text message", receiveText);
-    socket.on("emoji message", receiveEmoji);
-    socket.on("connect_error", (err) => {
-      console.error(
-        `An error occurred during a connection attempt (connect_error):`,
-        err
-      );
-    });
-    return () => socket.disconnect();
-  }, []);
+    if (socket) {
+      socket.on("remove_username_response", receiveRemoveUsernameResponse);
+      socket.on("user_list", receiveUserList);
+      socket.on("text_message", receiveText);
+      socket.on("emoji_message", receiveEmoji);
+    }
+    return () => {
+      socket.on("remove_username_response", receiveRemoveUsernameResponse);
+      socket.off("user_list", receiveUserList);
+      socket.off("text_message", receiveText);
+      socket.off("emoji_message", receiveEmoji);
+    };
+  }, [socket]);
 
   // Listen to Footer Height Changes
   useEffect(() => {
@@ -233,7 +213,7 @@ const ChatScreen = ({
                   cursor: "pointer",
                 },
               }}
-              onClick={resetState}
+              onClick={() => socket.emit("remove_username")}
             >
               <Typography
                 sx={{
@@ -461,13 +441,13 @@ const ChatScreen = ({
 };
 
 const mapState = (state) => {
-  const { username, socket, messages } = state.chat;
-  return { username, socket, messages };
+  const { socket, username, messages } = state.chat;
+  return { socket, username, messages };
 };
 
 export default connect(mapState, {
-  setSocket,
-  resetState,
+  receiveRemoveUsernameResponse,
+  receiveUserList,
   receiveText,
   receiveEmoji,
   sendText,

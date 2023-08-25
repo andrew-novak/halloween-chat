@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start:api": "npm run start:dev --prefix api",
-    "start:clientWeb": "npm start --prefix clientWeb",
+    "start:clientWeb": "REACT_APP_SHOW_LOGS=true npm start --prefix clientWeb",
     "start:clientMobile": "cd clientMobile && npx expo start",
     "start:api+clientWeb": "concurrently \"npm run start:api\" \"npm run start:clientWeb\"",
     "install:api": "npm i --prefix api",

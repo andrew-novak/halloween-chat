@@ -4,7 +4,10 @@ const socketIo = require("socket.io");
 const cors = require("cors");
 
 const checkEnvVars = require("./beforeRun/checkEnvVars");
+const setLogs = require("./debug/setLogs");
 const logger = require("./debug/logger");
+const isValidUsernameFormat = require("./helpers/isValidUsernameFormat");
+const isUsernameBusy = require("./helpers/isUsernameBusy");
 //const rootRouter = require("./routes");
 
 checkEnvVars();
@@ -13,58 +16,81 @@ const PORT = process.env.PUBLIC_HALLOWEEN_CHAT_API_PORT;
 
 let httpServer;
 try {
-  const app = express();
-  httpServer = http.Server(app);
+  const expressServer = express();
+  httpServer = http.Server(expressServer);
   const ioServer = new socketIo.Server(httpServer, {
     ...(NODE_ENV === "development" && {
       cors: { origin: "http://localhost:3000" },
     }),
   });
 
-  // app.use(cors());
+  // expressServer.use(cors());
 
-  app.use(express.json({ limit: "10mb" }));
+  expressServer.use(express.json({ limit: "10mb" }));
 
-  // log requests
-  app.use((req, res, next) => {
-    logger.debug(`Express request: ${req.method} ${req.url}`);
-    next();
-  });
-  ioServer.use((socket, next) => {
-    socket.onAny((eventName, ...args) => {
-      logger.debug(
-        `Socket.IO event: "${socket.nsp.name}" "${socket.id}" "${eventName}" "${socket.request.url}" Arguments:`,
-        args
-      );
-    });
-    next();
-  });
+  setLogs(expressServer, ioServer);
 
-  //app.use("/", rootRouter);
+  //expressServer.use("/", rootRouter);
 
+  const namedUsers = [];
   const allMessages = [];
 
   ioServer.on("connection", (socket) => {
-    logger.info("a user connected");
+    logger.info("user connected");
 
-    ioServer.of("");
+    // ioServer.of("");
+    // ioServer.of("/");
 
-    socket.on("text message", (message) => {
+    const removeUserFromList = (socketId) => {
+      // nothing will happen, no error thrown, if no socketId key
+      delete namedUsers[socketId];
+      ioServer.emit("user_list", Object.values(namedUsers));
+    };
+
+    socket.on("select_username", (username) => {
+      // check if incorrect format
+      if (!isValidUsernameFormat(username)) {
+        return socket.emit("select_username_response", {
+          errorMessage:
+            "The username must contain only letters, numbers, hyphens, and underscores.",
+        });
+      }
+      // check if busy
+      if (isUsernameBusy(username, namedUsers)) {
+        return socket.emit("select_username_response", {
+          errorMessage: "The username is currently taken.",
+        });
+      }
+
+      socket.on("remove_username", () => {
+        removeUserFromList(socket.id);
+        socket.emit("remove_username_response");
+      });
+
+      // update user list
+      namedUsers[socket.id] = { username };
+      socket.emit("select_username_response", { selectedUsername: username });
+      ioServer.emit("user_list", Object.values(namedUsers));
+      logger.info(`user selected username: '${username}'`);
+    });
+
+    socket.on("text_message", (message) => {
       logger.info("text message received:", message);
       allMessages.push(message);
       logger.info("messages:", allMessages);
-      ioServer.emit("text message", message);
+      ioServer.emit("text_message", message);
     });
 
-    socket.on("emoji message", (message) => {
+    socket.on("emoji_message", (message) => {
       logger.info("emoji message received:", message);
       allMessages.push(message);
       logger.info("messages:", allMessages);
-      ioServer.emit("emoji message", message);
+      ioServer.emit("emoji_message", message);
     });
 
     socket.on("disconnect", () => {
-      logger.info("a user disconnected");
+      logger.info("user disconnected");
+      removeUserFromList(socket.id);
     });
   });
 

@@ -1,11 +1,13 @@
 import { combineReducers } from "redux";
 
 import snackbar from "./snackbar";
+import helperTexts from "./helperTexts";
 import chat from "./chat";
 import { RESET_STATE } from "constants/actionTypes";
 
 const appReducer = combineReducers({
   snackbar,
+  helperTexts,
   chat,
 });
 

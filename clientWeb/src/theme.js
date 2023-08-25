@@ -8,6 +8,10 @@ const theme = createTheme({
       contrastText: "rgb(233, 178, 175)",
       //contrastText: "#716f6f",
     },
+    error: {
+      main: "#b90202",
+      //contrastText: "#fff",
+    },
     text: {
       primary: "#212121",
     },
