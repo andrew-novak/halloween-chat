@@ -16,10 +16,8 @@ import SendIcon from "@mui/icons-material/Send";
 import { connect } from "react-redux";
 
 import {
+  receiveDataUpdate,
   receiveRemoveUsernameResponse,
-  receiveUserList,
-  receiveText,
-  receiveEmoji,
 } from "actions/receive";
 import { sendText, sendEmoji } from "actions/send";
 import Screen from "components/Screen";
@@ -31,10 +29,8 @@ const ChatScreen = ({
   socket,
   username,
   messages,
+  receiveDataUpdate,
   receiveRemoveUsernameResponse,
-  receiveUserList,
-  receiveText,
-  receiveEmoji,
   sendText,
   sendEmoji,
 }) => {
@@ -49,18 +45,14 @@ const ChatScreen = ({
   // Socket.IO
   useEffect(() => {
     if (socket) {
+      socket.on("data_update", receiveDataUpdate);
       socket.on("remove_username_response", receiveRemoveUsernameResponse);
-      socket.on("user_list", receiveUserList);
-      socket.on("text_message", receiveText);
-      socket.on("emoji_message", receiveEmoji);
+      return () => {
+        socket.off("data_update", receiveDataUpdate);
+        socket.off("remove_username_response", receiveRemoveUsernameResponse);
+      };
     }
-    return () => {
-      socket.on("remove_username_response", receiveRemoveUsernameResponse);
-      socket.off("user_list", receiveUserList);
-      socket.off("text_message", receiveText);
-      socket.off("emoji_message", receiveEmoji);
-    };
-  }, [socket]);
+  }, [socket, receiveDataUpdate, receiveRemoveUsernameResponse]);
 
   // Listen to Footer Height Changes
   useEffect(() => {
@@ -446,10 +438,8 @@ const mapState = (state) => {
 };
 
 export default connect(mapState, {
+  receiveDataUpdate,
   receiveRemoveUsernameResponse,
-  receiveUserList,
-  receiveText,
-  receiveEmoji,
   sendText,
   sendEmoji,
 })(ChatScreen);

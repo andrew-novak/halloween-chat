@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Box, Typography, TextField, Button } from "@mui/material";
+import { Typography, TextField, Button } from "@mui/material";
 import { connect } from "react-redux";
 
 import icon from "assets/brand-icon.svg";

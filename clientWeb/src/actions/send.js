@@ -1,4 +1,4 @@
-import { API_URL } from "constants/envVars";
+import { API_URL } from "constants/env";
 
 export const sendText = (socket, author, content) => (dispatch) => {
   if (content.length < 1) return;

@@ -8,7 +8,7 @@ import {
   SOCKET_IO_BASE,
   SOCKET_IO_PATH,
   SHOW_LOGS,
-} from "constants/envVars";
+} from "constants/env";
 import setSocket from "actions/setSocket";
 import EnterUsernameScreen from "screens/EnterUsernameScreen";
 import ChatScreen from "screens/ChatScreen";

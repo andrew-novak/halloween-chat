@@ -1,7 +1,4 @@
-const envKeys = [
-  "PUBLIC_HALLOWEEN_CHAT_API_PORT",
-  "PUBLIC_HALLOWEEN_CHAT_SOCKET_IO_PATH",
-];
+const envKeys = ["HALLOWEEN_CHAT_API_PORT"];
 
 const checkEnv = (keys) => {
   for (key of keys) {

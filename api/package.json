@@ -1,5 +1,5 @@
 {
-  "name": "public-chat-api",
+  "name": "halloween-chat-api",
   "version": "1.0.0",
   "scripts": {
     "start:prod": "NODE_ENV=production node server.js",

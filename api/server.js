@@ -4,15 +4,15 @@ const socketIo = require("socket.io");
 const cors = require("cors");
 
 const checkEnvVars = require("./beforeRun/checkEnvVars");
+const { NODE_ENV, API_PORT } = require("./constants/env");
 const setLogs = require("./debug/setLogs");
 const logger = require("./debug/logger");
+const removeOldMessages = require("./helpers/removeOldMessages");
 const isValidUsernameFormat = require("./helpers/isValidUsernameFormat");
 const isUsernameBusy = require("./helpers/isUsernameBusy");
 //const rootRouter = require("./routes");
 
 checkEnvVars();
-const NODE_ENV = process.env.NODE_ENV;
-const PORT = process.env.PUBLIC_HALLOWEEN_CHAT_API_PORT;
 
 let httpServer;
 try {
@@ -28,23 +28,35 @@ try {
 
   expressServer.use(express.json({ limit: "10mb" }));
 
-  setLogs(expressServer, ioServer);
-
   //expressServer.use("/", rootRouter);
 
+  setLogs(expressServer, ioServer);
+
   const namedUsers = [];
-  const allMessages = [];
+  let allMessages = [];
+
+  const emitDataUpdate = () => {
+    ioServer.emit("data_update", {
+      users: namedUsers,
+      messages: allMessages,
+    });
+  };
+
+  setInterval(() => {
+    const newMessages = removeOldMessages(allMessages);
+    if (allMessages.length !== newMessages.length) {
+      allMessages = newMessages;
+      emitDataUpdate();
+    }
+  }, 3000);
 
   ioServer.on("connection", (socket) => {
     logger.info("user connected");
 
-    // ioServer.of("");
-    // ioServer.of("/");
-
     const removeUserFromList = (socketId) => {
       // nothing will happen, no error thrown, if no socketId key
       delete namedUsers[socketId];
-      ioServer.emit("user_list", Object.values(namedUsers));
+      emitDataUpdate();
     };
 
     socket.on("select_username", (username) => {
@@ -63,40 +75,42 @@ try {
       }
 
       socket.on("remove_username", () => {
-        const username = namedUsers[socket.id].username || null;
+        const username = namedUsers[socket.id]?.username || null;
         if (username) {
           logger.info(`user '${username}' removed username`);
         }
+        socket.emit("remove_username_response");
         // If an anonymous user will emit remove_username that's ok,
         // nothing will happen and they will receive the response, so
         // they will be able to redirect to the enter username screen.
         removeUserFromList(socket.id);
-        socket.emit("remove_username_response");
       });
 
       // update user list
       namedUsers[socket.id] = { username };
       socket.emit("select_username_response", { selectedUsername: username });
-      ioServer.emit("user_list", Object.values(namedUsers));
+      emitDataUpdate();
       logger.info(`user selected username: '${username}'`);
     });
 
-    socket.on("text_message", (message) => {
-      logger.info("text message received:", message);
+    socket.on("text_message", ({ author, content }) => {
+      logger.info(`[text] [${author}] ${content}`);
+      const timestamp = new Date();
+      const message = { author, category: "text", content, timestamp };
       allMessages.push(message);
-      logger.info("messages:", allMessages);
-      ioServer.emit("text_message", message);
+      emitDataUpdate();
     });
 
-    socket.on("emoji_message", (message) => {
-      logger.info("emoji message received:", message);
+    socket.on("emoji_message", ({ author, emojiName }) => {
+      logger.info(`[emoji] [${author}] ${emojiName}`);
+      const timestamp = new Date();
+      const message = { author, category: "emoji", content, timestamp };
       allMessages.push(message);
-      logger.info("messages:", allMessages);
-      ioServer.emit("emoji_message", message);
+      emitDataUpdate();
     });
 
     socket.on("disconnect", () => {
-      const username = namedUsers[socket.id].username || null;
+      const username = namedUsers[socket.id]?.username || null;
       if (username) {
         logger.info(`user '${username}' disconnected`);
       } else {
@@ -106,8 +120,10 @@ try {
     });
   });
 
-  httpServer.listen(PORT, () =>
-    logger.info(`server started on port: ${PORT} with NODE_ENV: ${NODE_ENV}`)
+  httpServer.listen(API_PORT, () =>
+    logger.info(
+      `server started on port: ${API_PORT} with NODE_ENV: ${NODE_ENV}`
+    )
   );
 } catch (err) {
   logger.error("An error occured:");

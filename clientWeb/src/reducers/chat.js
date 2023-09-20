@@ -1,14 +1,13 @@
 import {
-  SET_USERNAME,
   SET_SOCKET,
-  SET_USER_LIST,
-  ADD_MESSAGE,
+  SET_USERNAME,
+  DATA_UPDATE_RECEIVED,
 } from "constants/actionTypes";
 
 const initialState = {
   username: "",
   socket: null,
-  userList: [],
+  users: [],
   // one-message object example:
   // { author: "John", content: "Hello" }
   messages: [],
@@ -16,17 +15,14 @@ const initialState = {
 
 const chat = (state = initialState, action) => {
   switch (action.type) {
-    case SET_USERNAME:
-      return { ...state, username: action.username };
-
     case SET_SOCKET:
       return { ...state, socket: action.socket };
 
-    case SET_USER_LIST:
-      return { ...state, userList: action.userList };
+    case SET_USERNAME:
+      return { ...state, username: action.username };
 
-    case ADD_MESSAGE:
-      return { ...state, messages: [...state.messages, action.message] };
+    case DATA_UPDATE_RECEIVED:
+      return { ...state, users: action.users, messages: action.messages };
 
     default:
       return state;

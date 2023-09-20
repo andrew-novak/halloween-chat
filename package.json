@@ -1,5 +1,5 @@
 {
-  "name": "public-chat",
+  "name": "halloween-chat",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -19,10 +19,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/andrew-novak/public-chat.git"
+    "url": "git+https://github.com/andrew-novak/halloween-chat.git"
   },
   "bugs": {
-    "url": "https://github.com/andrew-novak/public-chat/issues"
+    "url": "https://github.com/andrew-novak/halloween-chat/issues"
   },
   "devDependencies": {
     "concurrently": "^7.6.0"

@@ -1,9 +1,5 @@
 import { setErrorHelperText } from "actions/helperTexts";
-import {
-  SET_USERNAME,
-  SET_USER_LIST,
-  ADD_MESSAGE,
-} from "constants/actionTypes";
+import { SET_USERNAME, DATA_UPDATE_RECEIVED } from "constants/actionTypes";
 
 export const receiveSelectUsernameResponse = ({
   selectedUsername,
@@ -17,17 +13,10 @@ export const receiveSelectUsernameResponse = ({
 };
 
 export const receiveRemoveUsernameResponse = () => (dispatch) => {
+  console.log("receiveRemoveUsernameResponse");
   dispatch({ type: SET_USERNAME, username: "" });
 };
 
-export const receiveUserList = (userList) => (dispatch) => {
-  dispatch({ type: SET_USER_LIST, userList });
-};
-
-export const receiveText = (message) => (dispatch) => {
-  dispatch({ type: ADD_MESSAGE, message: { category: "text", ...message } });
-};
-
-export const receiveEmoji = (message) => (dispatch) => {
-  dispatch({ type: ADD_MESSAGE, message: { category: "emoji", ...message } });
+export const receiveDataUpdate = ({ users, messages }) => (dispatch) => {
+  dispatch({ type: DATA_UPDATE_RECEIVED, users, messages });
 };
