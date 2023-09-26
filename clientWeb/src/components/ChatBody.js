@@ -116,6 +116,25 @@ const ChatBody = ({ maxWidth, users, messages, username, footerHeight }) => {
           >
             <Users users={users} />
           </Box>
+          <Typography
+            sx={{
+              fontSize: 18,
+              color: "rgba(242, 133, 126, 0.8)",
+              // text breaking
+              overflowWrap: "break-word",
+              wordWrap: "break-word",
+              wordBreak: "break-word",
+              hyphens: "auto",
+              width: "100%",
+              display: "flex",
+              justifyContent: "center",
+              border: "1px solid rgba(242, 133, 126, 0.8)",
+              borderRadius: "4px",
+              marginBottom: 3,
+            }}
+          >
+            All messages will disappear after 1 hour
+          </Typography>
           {messages.map(({ author, category, content, emojiName }, index) => {
             const isUsernameShown =
               author !== username &&
@@ -143,7 +162,7 @@ const ChatBody = ({ maxWidth, users, messages, username, footerHeight }) => {
                 {isUsernameShown && (
                   <div>
                     <Typography
-                      style={{
+                      sx={{
                         color: "#f2857e",
                         //color: "#231a2a",
                         fontSize: 16,

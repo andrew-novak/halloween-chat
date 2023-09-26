@@ -1,9 +1,10 @@
+const { MESSAGE_EXPIRATION_MS } = require("../constants/general");
+
 const removeOldMessages = (messages) => {
   const currentTime = new Date();
   const filteredMessages = messages.filter((message) => {
     const timeDifference = currentTime - message.timestamp;
-    const oneHourInMilliseconds = 60 * 60 * 1000; // 1 hour in milliseconds
-    return timeDifference <= oneHourInMilliseconds;
+    return timeDifference <= MESSAGE_EXPIRATION_MS;
   });
   return filteredMessages;
 };
