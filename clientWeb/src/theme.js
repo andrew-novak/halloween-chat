@@ -48,4 +48,6 @@ const theme = createTheme({
 
 theme.overrides.MuiCard.root.color = theme.palette.primary.contrastText;
 
+theme.breakpoints.values["600px"] = 600;
+
 export default theme;

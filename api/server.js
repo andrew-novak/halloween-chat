@@ -37,7 +37,7 @@ try {
 
   const emitDataUpdate = () => {
     ioServer.emit("data_update", {
-      users: namedUsers,
+      users: Object.values(namedUsers).map((user) => user.username),
       messages: allMessages,
     });
   };
@@ -104,7 +104,7 @@ try {
     socket.on("emoji_message", ({ author, emojiName }) => {
       logger.info(`[emoji] [${author}] ${emojiName}`);
       const timestamp = new Date();
-      const message = { author, category: "emoji", content, timestamp };
+      const message = { author, category: "emoji", emojiName, timestamp };
       allMessages.push(message);
       emitDataUpdate();
     });

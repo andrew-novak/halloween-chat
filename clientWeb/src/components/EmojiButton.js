@@ -5,7 +5,7 @@ const EmojiButton = ({ src, onClick }) => {
   return (
     <div>
       <IconButton
-        style={{
+        sx={{
           borderRadius: "100%",
           width: "50px",
           height: "50px",
