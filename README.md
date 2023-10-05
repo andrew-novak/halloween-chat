@@ -2,9 +2,9 @@
 
 # Halloween Chat
 
-<img src="https://github.com/andrew-novak/halloween-chat/raw/main/readmeAssets/chatting.gif" alt="GIF presenting use of the Halloween Chat app" width="512" height="512">
-
 An app where users choose their own usernames and engage in chat conversations with Halloween-themed emojis, all while leveraging Socket.IO for real-time communication between the client and server.
+
+<img src="https://github.com/andrew-novak/halloween-chat/raw/main/readmeAssets/chatting.gif" alt="GIF presenting use of the Halloween Chat app" width="512" height="512">
 
 ## To run demo:
 
